@@ -8,14 +8,15 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
-  const { name, email, password, roleName } = req.body;
+  // Frontend එකෙන් එන 'role' යතුර (key) මෙතනට ගන්න
+  const { name, email, password, role } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: "User already exists" });
 
-    // roleName එක හරහා අදාළ Role එකේ ObjectId එක සොයාගැනීම
-    const roleDoc = await Role.findOne({ role_name: roleName || "team_member" });
+    // role එක පාවිච්චි කර අදාළ Role එකේ ObjectId එක සොයාගැනීම
+    const roleDoc = await Role.findOne({ role_name: role || "team_member" });
     if (!roleDoc) return res.status(400).json({ message: "Invalid role provided" });
 
     const salt = await bcrypt.genSalt(10);
@@ -25,7 +26,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: roleDoc._id, // මෙතනදී ObjectId එක save වේ
+      role: roleDoc._id,
     });
 
     res.status(201).json({
@@ -44,14 +45,15 @@ const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).populate("role"); // Role එකත් එක්ක දත්ත ලබාගැනීම
+    // .populate("role") මගින් role දත්ත ලබාගැනීම
+    const user = await User.findOne({ email }).populate("role");
 
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role.role_name,
+        role: user.role.role_name, // දැන් මෙතන දෝෂයක් එන්නේ නැහැ
         token: generateToken(user._id),
       });
     } else {

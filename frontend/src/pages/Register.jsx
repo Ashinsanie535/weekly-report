@@ -1,17 +1,18 @@
 import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
-import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
-import axios from "axios"; // Added axios
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
+  // Initializing state with correct role value
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "member",
+    role: "team_member", // Set default to 'team_member' to match backend
   });
   
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,13 +21,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Sending registration data to the backend API
+      // Sending data to backend
       await axios.post("http://localhost:5000/api/auth/register", formData);
       alert("Registration successful! Redirecting to login...");
-      navigate("/login"); // Redirect to login after success
+      navigate("/login");
     } catch (error) {
-      console.error("Registration error:", error);
-      alert("Registration failed. Please try again.");
+      // Providing more detailed error feedback
+      console.error("Registration error:", error.response?.data || error.message);
+      alert("Registration failed: " + (error.response?.data?.message || "Please check your connection."));
     }
   };
 
@@ -71,7 +73,7 @@ const Register = () => {
             onChange={handleChange}
             value={formData.role}
           >
-            <option value="member">Team Member</option>
+            <option value="team_member">Team Member</option>
             <option value="manager">Manager / Admin</option>
           </select>
         </div>
