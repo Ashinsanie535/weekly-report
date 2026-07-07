@@ -1,5 +1,7 @@
 import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
+import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
+import axios from "axios"; // Added axios
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -8,14 +10,24 @@ const Register = () => {
     password: "",
     role: "member",
   });
+  
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registering user:", formData);
+    try {
+      // Sending registration data to the backend API
+      await axios.post("http://localhost:5000/api/auth/register", formData);
+      alert("Registration successful! Redirecting to login...");
+      navigate("/login"); // Redirect to login after success
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert("Registration failed. Please try again.");
+    }
   };
 
   return (
@@ -71,7 +83,7 @@ const Register = () => {
         </button>
       </form>
       <p className="text-center text-sm text-slate-500 mt-4">
-        Already have an account? <a href="/login" className="text-blue-600 hover:underline">Login</a>
+        Already have an account? <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
       </p>
     </AuthLayout>
   );
