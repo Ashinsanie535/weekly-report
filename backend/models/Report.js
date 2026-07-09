@@ -4,15 +4,17 @@ const reportSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Links this report to a specific User model
+      ref: "User",
       required: true,
     },
     weekRange: {
-      type: String, // Example: "2026-07-06 to 2026-07-12"
+      type: String,
       required: true,
     },
+    // project field එක String වෙනුවට ObjectId ලෙස වෙනස් කරන්න
     project: {
-      type: String, // Example: "Client A", "Internal Tooling"
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Project", // මෙය ඔබගේ Project model එකේ නම විය යුතුයි
       required: true,
     },
     tasksCompleted: {
@@ -28,10 +30,11 @@ const reportSchema = new mongoose.Schema(
       required: true,
     },
     hoursWorked: {
-      type: Number, // Optional field
+      type: Number,
+      default: 0, // 0 ලෙස සැකසීම වඩාත් සුදුසුයි
     },
     notes: {
-      type: String, // Optional field
+      type: String,
     },
     status: {
       type: String,
@@ -40,7 +43,7 @@ const reportSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Automatically creates createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

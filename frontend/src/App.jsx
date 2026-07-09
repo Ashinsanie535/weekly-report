@@ -1,11 +1,13 @@
-// src/App.js
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Report from "./pages/Report";
 import Dashboard from "./pages/Dashboard";
+import MyReports from "./pages/MyReports";
+import EditReport from "./pages/EditReport"; // EditReport පිටුව import කිරීම
 import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute"; // මෙය import කරන්න
+import ProtectedRoute from "./components/ProtectedRoute"; 
+import ManageProjects from "./pages/ManageProjects";
 
 function App() {
   return (
@@ -19,17 +21,38 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Weekly Report submission route (Team Member & Manager දෙදෙනාටම අවසර ඇත) */}
+        {/* Weekly Report submission route */}
         <Route path="/report" element={
           <ProtectedRoute allowedRoles={['team_member', 'manager']}>
             <Report />
           </ProtectedRoute>
         } />
         
-        {/* Team Dashboard route (Manager ට පමණක් අවසර ඇත) */}
+        {/* My Reports route */}
+        <Route path="/my-reports" element={
+          <ProtectedRoute allowedRoles={['team_member', 'manager']}>
+            <MyReports />
+          </ProtectedRoute>
+        } />
+
+        {/* Edit Report route (මෙය අලුතින් එක් කරන ලදී) */}
+        <Route path="/edit-report/:id" element={
+          <ProtectedRoute allowedRoles={['team_member', 'manager']}>
+            <EditReport />
+          </ProtectedRoute>
+        } />
+
+        {/* Team Dashboard route (Manager සඳහා) */}
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRoles={['manager']}>
             <Dashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* Project Management route (Manager සඳහා) */}
+        <Route path="/manage-projects" element={
+          <ProtectedRoute allowedRoles={['manager']}>
+            <ManageProjects />
           </ProtectedRoute>
         } />
       </Routes>

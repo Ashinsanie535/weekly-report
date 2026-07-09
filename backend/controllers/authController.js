@@ -7,15 +7,14 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });
 };
 
+// @desc    Register a new user
 const registerUser = async (req, res) => {
-  // Frontend එකෙන් එන 'role' යතුර (key) මෙතනට ගන්න
   const { name, email, password, role } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: "User already exists" });
 
-    // role එක පාවිච්චි කර අදාළ Role එකේ ObjectId එක සොයාගැනීම
     const roleDoc = await Role.findOne({ role_name: role || "team_member" });
     if (!roleDoc) return res.status(400).json({ message: "Invalid role provided" });
 
@@ -41,11 +40,11 @@ const registerUser = async (req, res) => {
   }
 };
 
+// @desc    Login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // .populate("role") මගින් role දත්ත ලබාගැනීම
     const user = await User.findOne({ email }).populate("role");
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -53,7 +52,7 @@ const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role.role_name, // දැන් මෙතන දෝෂයක් එන්නේ නැහැ
+        role: user.role.role_name,
         token: generateToken(user._id),
       });
     } else {
@@ -64,4 +63,15 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+// @desc    Get all users for project assignment
+const getAllUsers = async (req, res) => {
+  try {
+    // මුරපද (passwords) හැර අනෙක් සියලුම දත්ත ලබාගැනීම
+    const users = await User.find({}).select("-password");
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, getAllUsers };
