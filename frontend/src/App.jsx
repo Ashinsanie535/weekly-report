@@ -2,27 +2,36 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Report from "./pages/Report";    // Import the new Report page
-import Dashboard from "./pages/Dashboard"; // Import the new Dashboard page
+import Report from "./pages/Report";
+import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute"; // මෙය import කරන්න
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        {/* Redirect root path to login */}
+        {/* මුලික මාර්ගය login වෙත යොමු කිරීම */}
         <Route path="/" element={<Navigate to="/login" />} />
         
         {/* Authentication routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Weekly Report submission route for team members */}
-        <Route path="/report" element={<Report />} />
+        {/* Weekly Report submission route (Team Member & Manager දෙදෙනාටම අවසර ඇත) */}
+        <Route path="/report" element={
+          <ProtectedRoute allowedRoles={['team_member', 'manager']}>
+            <Report />
+          </ProtectedRoute>
+        } />
         
-        {/* Team Dashboard route for managers */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Team Dashboard route (Manager ට පමණක් අවසර ඇත) */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute allowedRoles={['manager']}>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );
